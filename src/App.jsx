@@ -116,26 +116,20 @@ const Topbar = ({ lang, setLang, t, page, setPage }) => {
       <div className="topbar-brand">OSH <em>TAXI</em> PARK</div>
       <div className="topbar-div" />
       
-      {/* Integrated Navigation in Topbar */}
-      <nav className="topbar-nav" style={{ display: 'flex', gap: '0.5rem' }}>
+      {/* Integrated Navigation in Topbar (Desktop only) */}
+      <nav className="topbar-nav">
         {NAV.map(({ id, Icon, label }) => (
           <button 
             key={id} 
             className={`top-nav-btn ${page === id ? 'active' : ''}`} 
             onClick={() => setPage(id)}
-            style={{
-              padding: '6px 12px', borderRadius: '8px', border: 'none',
-              background: page === id ? 'var(--yellow)' : 'transparent',
-              color: page === id ? '#000' : 'var(--text-2)',
-              fontWeight: 700, fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px',
-              cursor: 'pointer', transition: 'all 0.15s'
-            }}
           >
             <Icon size={16} />
             <span>{t[id] || label}</span>
           </button>
         ))}
       </nav>
+
 
       <div className="topbar-div" />
 

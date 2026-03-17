@@ -132,14 +132,20 @@ body {
 .topbar-div { width: 1px; height: 22px; background: transparent; flex-shrink: 0; }
 
 
-/* KPI Stats */
-.kpi-strip { display: flex; gap: 1.5rem; align-items: center; }
-.kpi { display: flex; flex-direction: column; gap: 1px; }
-.kpi .label { font-size: 0.6rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
-.kpi .val { font-size: 1rem; font-weight: 800; color: var(--text); }
-.kpi .val.g { color: var(--green); }
-.kpi .val.y { color: var(--orange); }
 .kpi .val.b { color: var(--blue); }
+
+/* Desktop Topbar Navigation */
+.topbar-nav { display: flex; align-items: center; gap: 0.5rem; margin-left: 0.5rem; }
+.top-nav-btn {
+  padding: 6px 12px; border-radius: 8px; border: none;
+  background: transparent; color: var(--text-2);
+  font-weight: 700; font-size: 0.75rem; 
+  display: flex; align-items: center; gap: 6px;
+  cursor: pointer; transition: all 0.15s;
+}
+.top-nav-btn:hover { background: var(--surface-2); color: var(--text); }
+.top-nav-btn.active { background: var(--yellow); color: #000; }
+
 
 /* Lang + Avatar */
 .topbar-right { display: flex; align-items: center; gap: 1rem; margin-left: auto; }
@@ -667,15 +673,20 @@ body {
   /* Topbar mobile */
   .topbar {
     padding: 0 1rem;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    justify-content: space-between;
   }
-  .topbar-brand { font-size: 0.82rem; }
-  .kpi-strip { display: none; } /* Hide KPIs on mobile — shown in dashboard cards */
+  .topbar-brand { font-size: 0.75rem; flex-shrink: 0; }
+  .topbar-nav { display: none !important; } /* Hide on mobile — use bottom nav */
+  .kpi-strip { display: none !important; }
   .topbar-div { display: none; }
-  .lang-bar { display: none; } /* Move to settings page on mobile */
+  .lang-bar { display: flex; gap: 4px; } /* Show on mobile but compact */
+  .lang-bar button { padding: 4px; font-size: 0.55rem; min-width: 24px; }
+  .logout-btn { padding: 6px; font-size: 0; }
   .logout-btn span { display: none; }
-  .logout-btn { padding: 6px 8px; font-size: 0; } /* Icon-only */
   .conn-dot { display: none; }
+  .topbar-right { gap: 0.5rem; margin-left: 0; justify-content: flex-end; }
+
 
   /* Bottom navigation bar */
   .bottom-nav {
