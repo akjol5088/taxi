@@ -57,34 +57,42 @@ const OrderCard = ({ order, onAccept, onReject, t }) => (
 
 
 const DashboardPage = ({ t }) => {
-  const { drivers, orders, stats, connected, acceptOrder, cancelOrder } = useSocket();
+  const { drivers, orders, stats, connected, isDemo, acceptOrder, cancelOrder } = useSocket();
+
   const { user, logout } = useAuth();
   const [filterIdle, setFilterIdle] = useState(false);
 
-  const handleAccept = (orderId) => {
-    const order = orders.find(o => o._id === orderId);
+  const handleAccept = (id) => {
+    const order = orders.find(o => o._id === id || o.id === id);
     if (!order) return;
 
-    // Find nearest idle driver
     const idleDrivers = drivers.filter(d => d.status === 'idle');
     if (idleDrivers.length === 0) {
       alert(t.no_free_cars);
       return;
     }
+    
     let nearest = idleDrivers[0];
     let minDist = Infinity;
 
-
     idleDrivers.forEach(d => {
-      const dist = Math.sqrt((d.lat - order.fromLat) ** 2 + (d.lng - order.fromLng) ** 2);
-      if (dist < minDist) {
-        minDist = dist;
-        nearest = d;
+      const dLat = d.lat || d.pos?.[0];
+      const dLng = d.lng || d.pos?.[1];
+      const oLat = order.fromLat || order.pickup?.[0];
+      const oLng = order.fromLng || order.pickup?.[1];
+
+      if (dLat && oLat) {
+        const dist = Math.sqrt((dLat - oLat) ** 2 + (dLng - oLng) ** 2);
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = d;
+        }
       }
     });
 
-    acceptOrder(orderId, nearest._id);
+    acceptOrder(id, nearest._id || nearest.id);
   };
+
 
 
   const idleCount   = drivers.filter(d => d.status === 'idle').length;
@@ -103,12 +111,11 @@ const DashboardPage = ({ t }) => {
 
         {/* Overlay top bar */}
         <div className="map-top">
-          <div className="map-chip">
-            {connected
-              ? <><Wifi size={12} color="#34C759" /> {t.live} · {drivers.length} {t.car}</>
-              : <><WifiOff size={12} color="#aeaeb2" /> {t.connecting}</>
-            }
+          <div className={`map-chip ${connected || isDemo ? 'live' : 'conn'}`}>
+            {isDemo ? <Wifi size={12} color="#ff9500" /> : (connected ? <Wifi size={12} color="#34C759" /> : <WifiOff size={12} color="#aeaeb2" />)}
+            {isDemo ? ' DEMO' : (connected ? ` ${t.live} · ${drivers.length} ${t.car}` : ` ${t.connecting}`)}
           </div>
+
           <div className="map-chip">
             <span style={{ color: '#34C759', fontWeight: 800 }}>●</span>
             {t.free}: {idleCount}
@@ -133,7 +140,7 @@ const DashboardPage = ({ t }) => {
           <div className="panel-title">{t.active_fleet}</div>
           <div className="fleet-scroll">
             {drivers.map(d => (
-              <div key={d._id} className="fleet-chip">
+              <div key={d._id || d.id} className="fleet-chip">
                 <div className="fc-num">{d.plate}</div>
                 <div className="fc-car">{d.car}</div>
                 <div className={`fc-st ${d.status}`}>
@@ -141,6 +148,7 @@ const DashboardPage = ({ t }) => {
                 </div>
               </div>
             ))}
+
           </div>
         </div>
 
@@ -164,15 +172,15 @@ const DashboardPage = ({ t }) => {
             ) : (
               pendingOrders.map(order => (
                 <OrderCard
-                  key={order._id}
+                  key={order._id || order.id}
                   order={order}
-                  onAccept={handleAccept}
-                  onReject={cancelOrder}
+                  onAccept={() => handleAccept(order._id || order.id)}
+                  onReject={() => cancelOrder(order._id || order.id)}
                   t={t}
                 />
-
               ))
             )}
+
           </AnimatePresence>
 
         </div>

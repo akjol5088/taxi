@@ -16,7 +16,10 @@ const NAV = [
   { id: 'fleet',     Icon: Car,        label: 'Флот' },
   { id: 'drivers',   Icon: Users,      label: 'Айдоочулар' },
   { id: 'finance',   Icon: FileText,   label: 'Финансы' },
+  { id: 'stats',     Icon: BarChart3,  label: 'Статистика' },
+  { id: 'settings',  Icon: Settings,   label: 'Орнотуулар' },
 ];
+
 
 
 
@@ -93,10 +96,11 @@ const BottomNav = ({ page, setPage, t }) => (
   <nav className="bottom-nav">
     {NAV.map(({ id, Icon, label }) => (
       <div key={id} className={`bottom-nav-item ${page === id ? 'active' : ''}`} onClick={() => setPage(id)}>
-        <Icon size={20} strokeWidth={1.8} />
+        <Icon size={18} strokeWidth={1.8} />
         <span>{t[id] || label}</span>
       </div>
     ))}
+
   </nav>
 );
 
@@ -105,7 +109,8 @@ const BottomNav = ({ page, setPage, t }) => (
 const Topbar = ({ lang, setLang, t, page, setPage }) => {
 
   const { user, logout } = useAuth();
-  const { drivers, stats, connected } = useSocket();
+  const { drivers, stats, connected, isDemo } = useSocket();
+
 
 
   const idleCount = drivers.filter(d => d.status === 'idle').length;
@@ -124,11 +129,12 @@ const Topbar = ({ lang, setLang, t, page, setPage }) => {
             className={`top-nav-btn ${page === id ? 'active' : ''}`} 
             onClick={() => setPage(id)}
           >
-            <Icon size={16} />
+            <Icon size={14} />
             <span>{t[id] || label}</span>
           </button>
         ))}
       </nav>
+
 
 
       <div className="topbar-div" />
@@ -158,12 +164,14 @@ const Topbar = ({ lang, setLang, t, page, setPage }) => {
           className="conn-dot"
           style={{
             width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-            background: connected ? '#34C759' : '#aeaeb2',
-            boxShadow: connected ? '0 0 0 3px rgba(52,199,89,0.2)' : 'none',
+            background: isDemo ? '#ff9500' : (connected ? '#34C759' : '#aeaeb2'),
+            boxShadow: connected || isDemo ? `0 0 0 3px ${isDemo ? 'rgba(255,149,0,0.2)' : 'rgba(52,199,89,0.2)'}` : 'none',
             transition: 'background 0.3s',
           }}
-          title={connected ? 'Онлайн' : 'Оффлайн'}
+          title={isDemo ? 'Demo Mode' : (connected ? 'Online' : 'Offline')}
         />
+        {isDemo && <span style={{ fontSize: '0.6rem', fontWeight: 800, color: '#ff9500' }}>DEMO</span>}
+
         <div className="lang-bar">
           {LANGS.map(l => (
             <button key={l} className={lang === l.toLowerCase() ? 'on' : ''} onClick={() => setLang(l.toLowerCase())}>
